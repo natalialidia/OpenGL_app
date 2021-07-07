@@ -6,6 +6,10 @@ Personagem::Personagem() {
     vec_j = glm::vec3(0,1,0);
 }
 
+glm::vec3 Personagem::getPos() {
+    return this->pos;
+}
+
 void Personagem::andaVertical(float distancia) {
 
     pos = pos + distancia * vec_j;

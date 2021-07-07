@@ -17,7 +17,9 @@ class Arvore {
 
     public:
         Arvore();
+        bool getAnotacao();
         void setAnotacao(bool anotacao);
+        glm::vec3 getPosicao();
         void setPosicao(float x, float y);
         void desenha();
 };

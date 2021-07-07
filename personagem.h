@@ -17,6 +17,7 @@ class Personagem {
     public:
 
         Personagem();
+        glm::vec3 getPos();
         void andaVertical(float distancia);
         void andaHorizontal(float distancia);
         void gira(float angulo);

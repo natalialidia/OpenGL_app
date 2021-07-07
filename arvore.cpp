@@ -6,8 +6,16 @@ Arvore::Arvore() {
     vec_j = glm::vec3(0,1,0);
 }
 
+bool Arvore::getAnotacao() {
+    return this->anotacao;
+}
+
 void Arvore::setAnotacao(bool anotacao)  {
     this->anotacao = anotacao;
+}
+
+glm::vec3 Arvore::getPosicao() {
+    return this->pos;
 }
 
 void Arvore::setPosicao(float x, float y) {
