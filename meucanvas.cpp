@@ -1,11 +1,14 @@
 #include "meucanvas.h"
-
+#include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
 #define WIDTH 32
 #define HEIGHT 24
 
 MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
-
+    srand(time(NULL));
     total = 3;
+    int n, r, p[total];
     papeis_achados = 0;
 
     arvores[0].setPosicao(5,5);
@@ -13,11 +16,20 @@ MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     arvores[2].setPosicao(15,15);
     arvores[3].setPosicao(18,8);
     arvores[4].setPosicao(8,18);
-
-    arvores[1].setAnotacao(true);
-    arvores[4].setAnotacao(true);
-    arvores[0].setAnotacao(true);
-
+    for(int i =0; i<total;i++){
+        n =rand()%5;
+        r=0;
+        for(int j=0; j<total; j++){
+                if(n == p[j]){
+                    r++;
+                }
+         }if(r==0){
+            p[i]=n;
+            arvores[n].setAnotacao(true);
+         }if(r!=0){
+            i--;
+            }
+    }
 }
 
 int MeuCanvas::getTotal() {
