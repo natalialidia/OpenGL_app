@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <string.h>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -8,9 +10,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
 
-//    papeisAchados = 0;
+    std::string str = "ACHE "+std::to_string(ui->canvas->getTotal())+" PAPÉIS!";
 
-//    connect(ui->canvas, SIGNAL(atualizaContador()),this,SLOT(updatePaperCounter()));
+    ui->objetivo->setText(QString::fromStdString(str));
+    ui->msgFinal->setText("");
+
+    connect(ui->canvas, SIGNAL(atualizaContador()),this,SLOT(updatePaperCounter()));
 
     ui->canvas->setFocusPolicy(Qt::StrongFocus);
 }
@@ -20,8 +25,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//void MainWindow::updatePaperCounter() {
-//    papeisAchados++;
-//    ui->contador->display(papeisAchados);
-//}
+void MainWindow::updatePaperCounter() {
+    ui->contador->display(ui->canvas->getPapeisAchados());
+
+    if (ui->canvas->getPapeisAchados() == ui->canvas->getTotal())
+        ui->msgFinal->setText("Parabéns! Você achou todas as notas!");
+}
 

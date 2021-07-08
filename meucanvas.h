@@ -10,19 +10,26 @@
 
 class MeuCanvas : public QOpenGLWidget {
 
+    Q_OBJECT
+
     private:
         Personagem personagem;
         Arvore arvores[5];
+        int total;
         int papeis_achados;
+
+    signals:
+        void atualizaContador();
 
     public:
         MeuCanvas(QWidget * parent);
 
+        int getTotal();
+        int getPapeisAchados();
         void initializeGL();
         void paintGL();
         void keyPressEvent(QKeyEvent *e);
         void verificaLocal();
-//        void keyReleaseEvent(QKeyEvent *e);
 };
 
 #endif // MEUCANVAS_H

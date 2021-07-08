@@ -5,17 +5,27 @@
 
 MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
 
+    total = 3;
     papeis_achados = 0;
 
     arvores[0].setPosicao(5,5);
     arvores[1].setPosicao(10,12);
     arvores[2].setPosicao(15,15);
-    arvores[3].setPosicao(20,8);
-    arvores[4].setPosicao(8,20);
+    arvores[3].setPosicao(18,8);
+    arvores[4].setPosicao(8,18);
 
     arvores[1].setAnotacao(true);
     arvores[4].setAnotacao(true);
+    arvores[0].setAnotacao(true);
 
+}
+
+int MeuCanvas::getTotal() {
+    return this->total;
+}
+
+int MeuCanvas::getPapeisAchados() {
+    return this->papeis_achados;
 }
 
 void MeuCanvas::initializeGL() {
@@ -32,8 +42,16 @@ void MeuCanvas::paintGL() {
     glOrtho(0, WIDTH, 0, HEIGHT, -1,1);
     glMatrixMode(GL_MODELVIEW);
 
-    for (unsigned int i = 0; i < sizeof(arvores); i++)
-        arvores[i].desenha();
+//    int qtd = sizeof(arvores);
+
+//    for (int i = 0; i < qtd; i++)
+//        arvores[i].desenha();
+
+    arvores[0].desenha();
+    arvores[1].desenha();
+    arvores[2].desenha();
+    arvores[3].desenha();
+    arvores[4].desenha();
 
     personagem.desenha();
 
@@ -88,7 +106,7 @@ void MeuCanvas::verificaLocal() {
 
             if (arvores[i].getAnotacao()) {
                 papeis_achados++;
-                qDebug() << papeis_achados;
+                emit atualizaContador();
                 arvores[i].setAnotacao(false);
             }
 
