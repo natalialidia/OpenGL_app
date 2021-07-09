@@ -14,7 +14,7 @@ class MeuCanvas : public QOpenGLWidget {
 
     private:
         Personagem personagem;
-        Arvore arvores[5];
+        Arvore arvores[10];
         int total;
         int papeis_achados;
 

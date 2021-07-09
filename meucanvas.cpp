@@ -11,13 +11,18 @@ MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     int n, r, p[total];
     papeis_achados = 0;
 
-    arvores[0].setPosicao(5,5);
-    arvores[1].setPosicao(10,12);
-    arvores[2].setPosicao(15,15);
+    arvores[0].setPosicao(25,12);
+    arvores[1].setPosicao(10,13);
+    arvores[2].setPosicao(2,15);
     arvores[3].setPosicao(18,8);
     arvores[4].setPosicao(8,18);
+    arvores[5].setPosicao(10,3);
+    arvores[6].setPosicao(27,6);
+    arvores[7].setPosicao(20,18);
+    arvores[8].setPosicao(5,10);
+    arvores[9].setPosicao(28,20);
     for(int i =0; i<total;i++){
-        n =rand()%5;
+        n =rand()%10;
         r=0;
         for(int j=0; j<total; j++){
                 if(n == p[j]){
@@ -64,7 +69,11 @@ void MeuCanvas::paintGL() {
     arvores[2].desenha();
     arvores[3].desenha();
     arvores[4].desenha();
-
+    arvores[5].desenha();
+    arvores[6].desenha();
+    arvores[7].desenha();
+    arvores[8].desenha();
+    arvores[9].desenha();
     personagem.desenha();
 
 }
