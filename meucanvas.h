@@ -6,6 +6,7 @@
 
 #include "personagem.h"
 #include "arvore.h"
+#include "camera.h"
 
 
 class MeuCanvas : public QOpenGLWidget {
@@ -13,10 +14,15 @@ class MeuCanvas : public QOpenGLWidget {
     Q_OBJECT
 
     private:
+        Camera camera;
         Personagem personagem;
         Arvore arvores[10];
         int total;
         int papeis_achados;
+        float mouse_lastX;
+        float mouse_lastY;
+        float yaw, pitch;
+        bool mouse_start;
 
     signals:
         void atualizaContador();
@@ -29,6 +35,7 @@ class MeuCanvas : public QOpenGLWidget {
         void initializeGL();
         void paintGL();
         void keyPressEvent(QKeyEvent *e);
+        void mouseMoveEvent(QMouseEvent *event);
         void verificaLocal();
 };
 

@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->canvas, SIGNAL(atualizaContador()),this,SLOT(updatePaperCounter()));
 
     ui->canvas->setFocusPolicy(Qt::StrongFocus);
+
+    ui->canvas->setCursor(Qt::BlankCursor);
 }
 
 MainWindow::~MainWindow()

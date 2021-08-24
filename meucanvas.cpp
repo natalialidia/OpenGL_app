@@ -6,6 +6,9 @@
 #define HEIGHT 24
 
 MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
+    setMouseTracking(true);
+
+
     srand(time(NULL));
     total = 3;
     int n, r, p[total];
@@ -35,6 +38,13 @@ MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
             i--;
             }
     }
+
+    camera.setEye(0,1.7f,0);
+    camera.setAt(0, 0, 5);
+    camera.setUp(0, 1, 0);
+
+    mouse_start = true;
+
 }
 
 int MeuCanvas::getTotal() {
@@ -46,68 +56,142 @@ int MeuCanvas::getPapeisAchados() {
 }
 
 void MeuCanvas::initializeGL() {
-    glClearColor(0.21f, 0.14f, 0.11f, 1);
+    glClearColor(1, 1, 1, 1);
+    glEnable(GL_PROGRAM_POINT_SIZE);
+    glEnable(GL_POINT_SMOOTH);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glEnable(GL_NORMALIZE);
 }
 
 void MeuCanvas::paintGL() {
-    // limpa o frame buffer
-    glClear(GL_COLOR_BUFFER_BIT);
 
-    // propriedades de visualização
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, WIDTH, 0, HEIGHT, -1,1);
+
+    float ar = this->width()/ (float) this->height();
+
+    glm::mat4 projMatrix = glm::perspective(glm::radians(50.0f),
+                                            ar,
+                                            0.1f,100.0f);
+
+    glLoadMatrixf(glm::value_ptr(projMatrix));
+
+    camera.setCamera();
+
     glMatrixMode(GL_MODELVIEW);
 
-//    int qtd = sizeof(arvores);
+    glLoadIdentity();
 
-//    for (int i = 0; i < qtd; i++)
-//        arvores[i].desenha();
+    //chão
+    glColor3f(0.21f, 0.14f, 0.11f);
+    glBegin(GL_QUADS);
+        glVertex3f(80,0,0);
+        glVertex3f(-80,0,0);
+        glVertex3f(-80,0,80);
+        glVertex3f(80,0,80);
+    glEnd();
 
-    arvores[0].desenha();
-    arvores[1].desenha();
-    arvores[2].desenha();
-    arvores[3].desenha();
-    arvores[4].desenha();
-    arvores[5].desenha();
-    arvores[6].desenha();
-    arvores[7].desenha();
-    arvores[8].desenha();
-    arvores[9].desenha();
-    personagem.desenha();
+    glLineWidth(10);
+    glBegin(GL_LINES);
+        glColor3f(1, 0, 0);
+        glVertex3f(-100,0,0);
+        glVertex3f(100,0,0);
+        glColor3f(0, 1, 0);
+        glVertex3f(0,-100,0);
+        glVertex3f(0,100,0);
+        glColor3f(0, 0, 1);
+        glVertex3f(0,0,0);
+        glVertex3f(0,0,100);
+    glEnd();
+
+//    arvores[0].desenha();
+//    arvores[1].desenha();
+//    arvores[2].desenha();
+//    arvores[3].desenha();
+//    arvores[4].desenha();
+//    arvores[5].desenha();
+//    arvores[6].desenha();
+//    arvores[7].desenha();
+//    arvores[8].desenha();
+//    arvores[9].desenha();
+//    personagem.desenha();
 
 }
 
 void MeuCanvas::keyPressEvent(QKeyEvent *e) {
 
+    float speed = 0.05f; //adicionar velocidade do movimento
+
+    glm::vec3 pos = camera.getEye();
+
     switch(e->key()) {
-        case Qt::Key_Up:
 
-            personagem.andaVertical(0.25f);
-
-            break;
-
-        case Qt::Key_Down:
-
-            personagem.andaVertical(-0.25f);
+        case Qt::Key_W: {
+            pos += speed * camera.getAt();
 
             break;
-
-        case Qt::Key_Left:
-
-            personagem.andaHorizontal(-0.25f);
-
-            break;
-        case Qt::Key_Right:
-
-            personagem.andaHorizontal(0.25f);
+        }
+        case Qt::Key_S: {
+            pos -= speed * camera.getAt();
 
             break;
+        }
+        case Qt::Key_A: {
+            pos -= glm::normalize(glm::cross(camera.getAt(), camera.getUp())) * speed;
+
+            break;
+        }
+        case Qt::Key_D: {
+            pos += glm::normalize(glm::cross(camera.getAt(), camera.getUp())) * speed;
+
+            break;
+        }
+
         case Qt::Key_E:
             MeuCanvas::verificaLocal();
 
             break;
     }
+
+    camera.setEye(pos.x, pos.y, pos.z);
+
+    update();
+
+}
+
+void MeuCanvas::mouseMoveEvent(QMouseEvent* event) {
+
+    if (mouse_start) {
+        mouse_lastX = event->pos().x();
+        mouse_lastY = event->pos().y();
+        mouse_start = false;
+    }
+
+    float xoffset = event->pos().x() - mouse_lastX;
+    float yoffset = mouse_lastY -  event->pos().y();
+    mouse_lastX = event->pos().x();
+    mouse_lastY = event->pos().y();
+
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw   += xoffset;
+    pitch += yoffset;
+
+    if(pitch > 89.0f)
+        pitch = 89.0f;
+    if(pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction = glm::normalize(direction);
+    camera.setAt(direction.x, direction.y, direction.z);
 
     update();
 

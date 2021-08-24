@@ -1,4 +1,4 @@
-QT       += core gui opengl
+QT       += core gui opengl openglwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,6 +12,7 @@ INCLUDEPATH += $$PWD/glm
 
 SOURCES += \
     arvore.cpp \
+    camera.cpp \
     main.cpp \
     mainwindow.cpp \
     meucanvas.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
 
 HEADERS += \
     arvore.h \
+    camera.h \
     mainwindow.h \
     meucanvas.h \
     personagem.h
