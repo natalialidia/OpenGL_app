@@ -43,7 +43,7 @@ MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     camera.setAt(0, 0, 5);
     camera.setUp(0, 1, 0);
 
-    mouse_start = true;
+    iniciado = false;
 
 }
 
@@ -56,7 +56,7 @@ int MeuCanvas::getPapeisAchados() {
 }
 
 void MeuCanvas::initializeGL() {
-    glClearColor(1, 1, 1, 1);
+    glClearColor(.05f, .08f, .27f, 1);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glEnable(GL_POINT_SMOOTH);
     glEnable(GL_DEPTH_TEST);
@@ -129,12 +129,12 @@ void MeuCanvas::keyPressEvent(QKeyEvent *e) {
     switch(e->key()) {
 
         case Qt::Key_W: {
-            pos += speed * camera.getAt();
+            pos += speed * glm::vec3(camera.getAt().x, 0, camera.getAt().z);
 
             break;
         }
         case Qt::Key_S: {
-            pos -= speed * camera.getAt();
+            pos -= speed * glm::vec3(camera.getAt().x, 0, camera.getAt().z);
 
             break;
         }
@@ -153,6 +153,11 @@ void MeuCanvas::keyPressEvent(QKeyEvent *e) {
             MeuCanvas::verificaLocal();
 
             break;
+        case Qt::Key_Escape: {
+            unsetCursor();
+            iniciado = false;
+            break;
+        }
     }
 
     camera.setEye(pos.x, pos.y, pos.z);
@@ -161,39 +166,48 @@ void MeuCanvas::keyPressEvent(QKeyEvent *e) {
 
 }
 
+void MeuCanvas::mousePressEvent(QMouseEvent* event) {
+    setCursor(Qt::BlankCursor);
+    cursor().setPos(mapToGlobal(rect().center()));
+    iniciado = true;
+}
+
 void MeuCanvas::mouseMoveEvent(QMouseEvent* event) {
 
-    if (mouse_start) {
-        mouse_lastX = event->pos().x();
-        mouse_lastY = event->pos().y();
-        mouse_start = false;
+    if (event->pos() != rect().center() && iniciado) {
+
+        QPoint centro = mapToGlobal(rect().center());
+        QPointF delta = (event->globalPosition() - centro);
+
+        if (delta.isNull()) // mouse didn't move
+            return;
+
+        float xoffset = delta.x();
+        float yoffset = - delta.y();
+
+        float sensitivity = 0.1f;
+        xoffset *= sensitivity;
+        yoffset *= sensitivity;
+
+        yaw   += xoffset;
+        pitch += yoffset;
+
+        if (pitch > 89.0f)
+            pitch = 89.0f;
+        if (pitch < -89.0f)
+            pitch = -89.0f;
+
+        glm::vec3 direction;
+        direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+        direction.y = sin(glm::radians(pitch));
+        direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        direction = glm::normalize(direction);
+        camera.setAt(direction.x, direction.y, direction.z);
+
+        update();
+
+        cursor().setPos(mapToGlobal(rect().center()));
     }
-
-    float xoffset = event->pos().x() - mouse_lastX;
-    float yoffset = mouse_lastY -  event->pos().y();
-    mouse_lastX = event->pos().x();
-    mouse_lastY = event->pos().y();
-
-    float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw   += xoffset;
-    pitch += yoffset;
-
-    if(pitch > 89.0f)
-        pitch = 89.0f;
-    if(pitch < -89.0f)
-        pitch = -89.0f;
-
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction = glm::normalize(direction);
-    camera.setAt(direction.x, direction.y, direction.z);
-
-    update();
 
 }
 

@@ -19,10 +19,8 @@ class MeuCanvas : public QOpenGLWidget {
         Arvore arvores[10];
         int total;
         int papeis_achados;
-        float mouse_lastX;
-        float mouse_lastY;
         float yaw, pitch;
-        bool mouse_start;
+        bool iniciado;
 
     signals:
         void atualizaContador();
@@ -35,6 +33,7 @@ class MeuCanvas : public QOpenGLWidget {
         void initializeGL();
         void paintGL();
         void keyPressEvent(QKeyEvent *e);
+        void mousePressEvent(QMouseEvent* evt);
         void mouseMoveEvent(QMouseEvent *event);
         void verificaLocal();
 };
