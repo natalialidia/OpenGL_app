@@ -20,7 +20,7 @@ class MeuCanvas : public QOpenGLWidget {
         int total;
         int papeis_achados;
         float yaw, pitch;
-        bool iniciado;
+        bool pausado;
 
     signals:
         void atualizaContador();

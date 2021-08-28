@@ -13,6 +13,7 @@ INCLUDEPATH += $$PWD/glm
 SOURCES += \
     arvore.cpp \
     camera.cpp \
+    face.cpp \
     main.cpp \
     mainwindow.cpp \
     meucanvas.cpp \
@@ -21,6 +22,7 @@ SOURCES += \
 HEADERS += \
     arvore.h \
     camera.h \
+    face.h \
     mainwindow.h \
     meucanvas.h \
     personagem.h
@@ -32,3 +34,6 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    resources.qrc

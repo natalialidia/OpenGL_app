@@ -10,17 +10,36 @@
 #include "glm/ext.hpp"
 #include "glm/trigonometric.hpp"
 
+#include "face.h"
+
+#include <QString>
+#include <QFile>
+#include <QTextStream>
+#include <QDebug>
+
+#include <vector>
+using namespace std;
+
 class Arvore {
     private:
         bool anotacao;
-        glm::vec3 pos, vec_i, vec_j;
+        glm::vec3 pos, vec_i, vec_j, vec_k;
+
+        vector <glm::vec3> vertices;
+        vector <glm::vec3> normais;
+        vector <Face> faces;
+
+        void lerOBJ();
+        void setVertices(QStringList fields);
+        void setNormais(QStringList fields);
+        void setFaces(QStringList fields);
 
     public:
         Arvore();
         bool getAnotacao();
         void setAnotacao(bool anotacao);
         glm::vec3 getPosicao();
-        void setPosicao(float x, float y);
+        void setPosicao(float x, float y, float z);
         void desenha();
 };
 

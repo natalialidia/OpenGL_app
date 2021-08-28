@@ -14,16 +14,16 @@ MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     int n, r, p[total];
     papeis_achados = 0;
 
-    arvores[0].setPosicao(25,12);
-    arvores[1].setPosicao(10,13);
-    arvores[2].setPosicao(2,15);
-    arvores[3].setPosicao(18,8);
-    arvores[4].setPosicao(8,18);
-    arvores[5].setPosicao(10,3);
-    arvores[6].setPosicao(27,6);
-    arvores[7].setPosicao(20,18);
-    arvores[8].setPosicao(5,10);
-    arvores[9].setPosicao(28,20);
+    arvores[0].setPosicao(5,0,5);
+//    arvores[1].setPosicao(10,13);
+//    arvores[2].setPosicao(2,15);
+//    arvores[3].setPosicao(18,8);
+//    arvores[4].setPosicao(8,18);
+//    arvores[5].setPosicao(10,3);
+//    arvores[6].setPosicao(27,6);
+//    arvores[7].setPosicao(20,18);
+//    arvores[8].setPosicao(5,10);
+//    arvores[9].setPosicao(28,20);
     for(int i =0; i<total;i++){
         n =rand()%10;
         r=0;
@@ -43,7 +43,7 @@ MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     camera.setAt(0, 0, 5);
     camera.setUp(0, 1, 0);
 
-    iniciado = false;
+    pausado = false;
 
 }
 
@@ -106,7 +106,7 @@ void MeuCanvas::paintGL() {
         glVertex3f(0,0,100);
     glEnd();
 
-//    arvores[0].desenha();
+    arvores[0].desenha();
 //    arvores[1].desenha();
 //    arvores[2].desenha();
 //    arvores[3].desenha();
@@ -122,29 +122,31 @@ void MeuCanvas::paintGL() {
 
 void MeuCanvas::keyPressEvent(QKeyEvent *e) {
 
-    float speed = 0.05f; //adicionar velocidade do movimento
+    float vel = 0.05f; //adicionar velocidade do movimento
 
     glm::vec3 pos = camera.getEye();
+
+    glm::vec3 direcao = glm::vec3(camera.getAt().x, 0, camera.getAt().z);
 
     switch(e->key()) {
 
         case Qt::Key_W: {
-            pos += speed * glm::vec3(camera.getAt().x, 0, camera.getAt().z);
+            pos += vel * direcao;
 
             break;
         }
         case Qt::Key_S: {
-            pos -= speed * glm::vec3(camera.getAt().x, 0, camera.getAt().z);
+            pos -= vel * direcao;
 
             break;
         }
         case Qt::Key_A: {
-            pos -= glm::normalize(glm::cross(camera.getAt(), camera.getUp())) * speed;
+            pos -= glm::normalize(glm::cross(camera.getAt(), camera.getUp())) * vel;
 
             break;
         }
         case Qt::Key_D: {
-            pos += glm::normalize(glm::cross(camera.getAt(), camera.getUp())) * speed;
+            pos += glm::normalize(glm::cross(camera.getAt(), camera.getUp())) * vel;
 
             break;
         }
@@ -155,7 +157,7 @@ void MeuCanvas::keyPressEvent(QKeyEvent *e) {
             break;
         case Qt::Key_Escape: {
             unsetCursor();
-            iniciado = false;
+            pausado = false;
             break;
         }
     }
@@ -169,12 +171,12 @@ void MeuCanvas::keyPressEvent(QKeyEvent *e) {
 void MeuCanvas::mousePressEvent(QMouseEvent* event) {
     setCursor(Qt::BlankCursor);
     cursor().setPos(mapToGlobal(rect().center()));
-    iniciado = true;
+    pausado = true;
 }
 
 void MeuCanvas::mouseMoveEvent(QMouseEvent* event) {
 
-    if (event->pos() != rect().center() && iniciado) {
+    if (event->pos() != rect().center() && pausado) {
 
         QPoint centro = mapToGlobal(rect().center());
         QPointF delta = (event->globalPosition() - centro);
