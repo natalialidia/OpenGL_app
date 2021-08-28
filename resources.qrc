@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>models/piramide.obj</file>
+        <file>models/tree3.obj</file>
     </qresource>
 </RCC>

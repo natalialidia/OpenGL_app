@@ -14,6 +14,7 @@ SOURCES += \
     arvore.cpp \
     camera.cpp \
     face.cpp \
+    luz.cpp \
     main.cpp \
     mainwindow.cpp \
     meucanvas.cpp \
@@ -23,6 +24,7 @@ HEADERS += \
     arvore.h \
     camera.h \
     face.h \
+    luz.h \
     mainwindow.h \
     meucanvas.h \
     personagem.h

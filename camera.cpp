@@ -3,7 +3,6 @@
 #include "camera.h"
 
 Camera::Camera() {
-
 }
 
 glm::vec3 Camera::getEye() {

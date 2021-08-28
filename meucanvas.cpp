@@ -2,8 +2,6 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
-#define WIDTH 32
-#define HEIGHT 24
 
 MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     setMouseTracking(true);
@@ -14,7 +12,12 @@ MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     int n, r, p[total];
     papeis_achados = 0;
 
-    arvores[0].setPosicao(5,0,5);
+    arvores[0].translacao(0,5,10);
+    arvores[0].escala(.02f);
+
+    arvores[1].translacao(3,5,13);
+    arvores[1].escala(.02f);
+    arvores[1].rotacao(45.0f);
 //    arvores[1].setPosicao(10,13);
 //    arvores[2].setPosicao(2,15);
 //    arvores[3].setPosicao(18,8);
@@ -43,7 +46,15 @@ MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     camera.setAt(0, 0, 5);
     camera.setUp(0, 1, 0);
 
-    pausado = false;
+    lanterna.setTipo(1);
+    lanterna.setAngLuz(12.0f);
+
+    natural.setTipo(2);
+    natural.setLuzDif(glm::vec3(.2f));
+    natural.setLuzAmb(glm::vec3(.1f));
+    natural.setLuzEsp(glm::vec3(1));
+
+    pausado = true;
 
 }
 
@@ -84,14 +95,16 @@ void MeuCanvas::paintGL() {
 
     glLoadIdentity();
 
-    //chão
-    glColor3f(0.21f, 0.14f, 0.11f);
-    glBegin(GL_QUADS);
-        glVertex3f(80,0,0);
-        glVertex3f(-80,0,0);
-        glVertex3f(-80,0,80);
-        glVertex3f(80,0,80);
-    glEnd();
+    // define a posição da lanterna em coordenada de câmera
+    lanterna.setPosLuz(glm::vec3(camera.getCameraMatrix() * glm::vec4(camera.getEye(), 1.0f)));
+
+    // define a direção da lanterna em coordenada de câmera
+    lanterna.setDirLuz(glm::vec3(glm::transpose(glm::inverse(camera.getCameraMatrix())) * glm::vec4(camera.getAt(), 0.0f)));
+
+    // define a direção da luz natural em coordenada de câmera
+    natural.setDirLuz(glm::vec3(glm::transpose(glm::inverse(camera.getCameraMatrix())) * glm::vec4(-1, -1, 0, 0)));
+
+    this->desenhaCenario();
 
     glLineWidth(10);
     glBegin(GL_LINES);
@@ -106,8 +119,8 @@ void MeuCanvas::paintGL() {
         glVertex3f(0,0,100);
     glEnd();
 
-    arvores[0].desenha();
-//    arvores[1].desenha();
+    arvores[0].desenha(lanterna, natural, camera);
+    arvores[1].desenha(lanterna, natural, camera);
 //    arvores[2].desenha();
 //    arvores[3].desenha();
 //    arvores[4].desenha();
@@ -117,6 +130,58 @@ void MeuCanvas::paintGL() {
 //    arvores[8].desenha();
 //    arvores[9].desenha();
 //    personagem.desenha();
+
+}
+
+void MeuCanvas::desenhaCenario() {
+
+    glm::vec3 vertices[4] = {glm::vec3(80,0,0),
+                             glm::vec3(-80,0,0),
+                             glm::vec3(-80,0,80),
+                             glm::vec3(80,0,80)};
+
+    glm::vec3 normal = glm::vec3(0,1,0);
+
+
+    glm::vec3 mat_dif = glm::vec3(0.21f, 0.14f, 0.11f);
+    glm::vec3 mat_esp = glm::vec3(1, 1, 1);
+
+    lanterna.setMatDif(mat_dif);
+    lanterna.setMatAmb(0.2f * mat_dif);
+    lanterna.setMatEsp(mat_esp);
+    lanterna.setMatExp(16);
+
+    natural.setMatDif(mat_dif);
+    natural.setMatAmb(0.2f * mat_dif);
+    natural.setMatEsp(mat_esp);
+    natural.setMatExp(16);
+
+    glm::vec3 cor = glm::vec3(0,0,0);
+
+    glBegin(GL_QUADS);
+
+        for (int i = 0; i < 4; i++) {
+
+            cor = lanterna.calcIluminacao(glm::vec3(camera.getCameraMatrix() * glm::vec4(camera.getEye(), 1.0f)),
+                                          vertices[i],
+                                          normal,
+                                          glm::transpose(glm::inverse(camera.getCameraMatrix())),
+                                          camera.getCameraMatrix());
+
+            cor += natural.calcIluminacao(glm::vec3(camera.getCameraMatrix() * glm::vec4(camera.getEye(), 1.0f)),
+                                          vertices[i],
+                                          normal,
+                                          glm::transpose(glm::inverse(camera.getCameraMatrix())),
+                                          camera.getCameraMatrix());
+
+            glColor3fv(glm::value_ptr(cor));
+
+            glVertex3fv(glm::value_ptr(vertices[i]));
+        }
+
+
+    glEnd();
+
 
 }
 
@@ -157,7 +222,7 @@ void MeuCanvas::keyPressEvent(QKeyEvent *e) {
             break;
         case Qt::Key_Escape: {
             unsetCursor();
-            pausado = false;
+            pausado = true;
             break;
         }
     }
@@ -171,12 +236,12 @@ void MeuCanvas::keyPressEvent(QKeyEvent *e) {
 void MeuCanvas::mousePressEvent(QMouseEvent* event) {
     setCursor(Qt::BlankCursor);
     cursor().setPos(mapToGlobal(rect().center()));
-    pausado = true;
+    pausado = false;
 }
 
 void MeuCanvas::mouseMoveEvent(QMouseEvent* event) {
 
-    if (event->pos() != rect().center() && pausado) {
+    if (event->pos() != rect().center() && !pausado) {
 
         QPoint centro = mapToGlobal(rect().center());
         QPointF delta = (event->globalPosition() - centro);

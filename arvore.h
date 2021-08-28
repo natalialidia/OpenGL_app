@@ -11,6 +11,8 @@
 #include "glm/trigonometric.hpp"
 
 #include "face.h"
+#include "luz.h"
+#include "camera.h"
 
 #include <QString>
 #include <QFile>
@@ -40,7 +42,10 @@ class Arvore {
         void setAnotacao(bool anotacao);
         glm::vec3 getPosicao();
         void setPosicao(float x, float y, float z);
-        void desenha();
+        void escala(float valor);
+        void translacao(float x, float y, float z);
+        void rotacao(float ang);
+        void desenha(Luz lanterna, Luz natural, Camera camera);
 };
 
 #endif // ARVORE_H
