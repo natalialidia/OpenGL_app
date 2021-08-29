@@ -3,6 +3,7 @@
 
 #include <QOpenGLWidget>
 #include <QKeyEvent>
+#include <QDateTime>
 
 #include "personagem.h"
 #include "arvore.h"
@@ -16,7 +17,7 @@ class MeuCanvas : public QOpenGLWidget {
 
     private:
         Camera camera;
-        float yaw, pitch;
+        int cam_frente, cam_tras, cam_esq, cam_dir;
 
         Personagem personagem;
         Arvore arvores[10];
@@ -27,7 +28,6 @@ class MeuCanvas : public QOpenGLWidget {
         int total;
         int papeis_achados;
         bool pausado;
-
 
         void desenhaCenario();
 
@@ -42,9 +42,13 @@ class MeuCanvas : public QOpenGLWidget {
         void initializeGL();
         void paintGL();
         void keyPressEvent(QKeyEvent *e);
+        void keyReleaseEvent(QKeyEvent *e);
         void mousePressEvent(QMouseEvent* evt);
         void mouseMoveEvent(QMouseEvent *event);
         void verificaLocal();
+
+    public slots:
+        void idleGL();
 };
 
 #endif // MEUCANVAS_H

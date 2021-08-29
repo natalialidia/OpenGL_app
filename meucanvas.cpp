@@ -187,38 +187,26 @@ void MeuCanvas::desenhaCenario() {
 
 void MeuCanvas::keyPressEvent(QKeyEvent *e) {
 
-    float vel = 0.05f; //adicionar velocidade do movimento
-
-    glm::vec3 pos = camera.getEye();
-
-    glm::vec3 direcao = glm::vec3(camera.getAt().x, 0, camera.getAt().z);
-
     switch(e->key()) {
 
         case Qt::Key_W: {
-            pos += vel * direcao;
-
+            cam_frente = 1;
             break;
         }
         case Qt::Key_S: {
-            pos -= vel * direcao;
-
+            cam_tras = 1;
             break;
         }
         case Qt::Key_A: {
-            pos -= glm::normalize(glm::cross(camera.getAt(), camera.getUp())) * vel;
-
+            cam_esq = 1;
             break;
         }
         case Qt::Key_D: {
-            pos += glm::normalize(glm::cross(camera.getAt(), camera.getUp())) * vel;
-
+            cam_dir = 1;
             break;
         }
-
         case Qt::Key_E:
             MeuCanvas::verificaLocal();
-
             break;
         case Qt::Key_Escape: {
             unsetCursor();
@@ -227,9 +215,29 @@ void MeuCanvas::keyPressEvent(QKeyEvent *e) {
         }
     }
 
-    camera.setEye(pos.x, pos.y, pos.z);
+}
 
-    update();
+void MeuCanvas::keyReleaseEvent(QKeyEvent *e) {
+
+    switch(e->key()) {
+
+        case Qt::Key_W: {
+            cam_frente = 0;
+            break;
+        }
+        case Qt::Key_S: {
+            cam_tras = 0;
+            break;
+        }
+        case Qt::Key_A: {
+            cam_esq = 0;
+            break;
+        }
+        case Qt::Key_D: {
+            cam_dir = 0;
+            break;
+        }
+    }
 
 }
 
@@ -246,30 +254,7 @@ void MeuCanvas::mouseMoveEvent(QMouseEvent* event) {
         QPoint centro = mapToGlobal(rect().center());
         QPointF delta = (event->globalPosition() - centro);
 
-        if (delta.isNull()) // mouse didn't move
-            return;
-
-        float xoffset = delta.x();
-        float yoffset = - delta.y();
-
-        float sensitivity = 0.1f;
-        xoffset *= sensitivity;
-        yoffset *= sensitivity;
-
-        yaw   += xoffset;
-        pitch += yoffset;
-
-        if (pitch > 89.0f)
-            pitch = 89.0f;
-        if (pitch < -89.0f)
-            pitch = -89.0f;
-
-        glm::vec3 direction;
-        direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        direction.y = sin(glm::radians(pitch));
-        direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-        direction = glm::normalize(direction);
-        camera.setAt(direction.x, direction.y, direction.z);
+        camera.olha(delta.x(), - delta.y());
 
         update();
 
@@ -299,6 +284,14 @@ void MeuCanvas::verificaLocal() {
         }
 
     }
+
+}
+
+void MeuCanvas::idleGL() {
+
+    camera.anda(cam_frente, cam_tras, cam_esq, cam_dir);
+
+    update();
 
 }
 

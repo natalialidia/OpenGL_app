@@ -28,12 +28,11 @@ class Arvore {
         glm::vec3 pos, vec_i, vec_j, vec_k;
 
         vector <glm::vec3> vertices;
-        vector <glm::vec3> normais;
+        vector <glm::vec3> v_normais;
         vector <Face> faces;
 
         void lerOBJ();
         void setVertices(QStringList fields);
-        void setNormais(QStringList fields);
         void setFaces(QStringList fields);
 
     public:

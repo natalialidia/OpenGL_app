@@ -35,11 +35,15 @@ void Arvore::lerOBJ() {
             this->setFaces(fields);
 
         } else if (fields[0] == "vn") { // vetores normais, para iluminação
-            this->setNormais(fields);
+            // this->setNormais(fields);
         }
     }
 
     file.close();
+
+    // normaliza as normais dos vértices
+    for (auto i = v_normais.begin(); i != v_normais.end(); ++i)
+        (*i) = glm::normalize((*i));
 
 }
 
@@ -50,15 +54,9 @@ void Arvore::setVertices(QStringList fields) {
     float coordZ = fields[3].toFloat();
 
     vertices.push_back(glm::vec3(coordX, coordY, coordZ));
-}
 
-void Arvore::setNormais(QStringList fields) {
-
-    float coordX = fields[1].toFloat();
-    float coordY = fields[2].toFloat();
-    float coordZ = fields[3].toFloat();
-
-    normais.push_back(glm::vec3(coordX, coordY, coordZ));
+    //inicia a normal do vértice
+    v_normais.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 void Arvore::setFaces(QStringList fields) {
@@ -87,6 +85,10 @@ void Arvore::setFaces(QStringList fields) {
     // adiciona a face
     faces.push_back(face);
 
+    // calcula as normais dos vértices da face
+    v_normais[face.getVertice(0)] += n;
+    v_normais[face.getVertice(1)] += n;
+    v_normais[face.getVertice(2)] += n;
 }
 
 void Arvore::escala(float valor) {
@@ -162,23 +164,23 @@ void Arvore::desenha(Luz lanterna, Luz natural, Camera camera) {
     glm::vec3 cor = glm::vec3(0,0,0);
 
     glm::vec3 mat_dif = glm::vec3(0, .8f, 0);
+    glm::vec3 mat_amb = 0.2f * mat_dif;
     glm::vec3 mat_esp = glm::vec3(1, 1, 1);
+    float mat_exp = 16;
 
     lanterna.setMatDif(mat_dif);
-    lanterna.setMatAmb(0.2f * mat_dif);
+    lanterna.setMatAmb(mat_amb);
     lanterna.setMatEsp(mat_esp);
-    lanterna.setMatExp(16);
+    lanterna.setMatExp(mat_exp);
 
     natural.setMatDif(mat_dif);
-    natural.setMatAmb(0.2f * mat_dif);
+    natural.setMatAmb(mat_amb);
     natural.setMatEsp(mat_esp);
-    natural.setMatExp(16);
+    natural.setMatExp(mat_exp);
 
     // desenha o objeto percorrendo todas as faces
     // e os vértices de cada uma delas
     glBegin(GL_TRIANGLES);
-
-        // glColor3f(0, .8f, 0);
 
         for (auto i = faces.begin(); i != faces.end(); ++i) {
 
@@ -189,21 +191,36 @@ void Arvore::desenha(Luz lanterna, Luz natural, Camera camera) {
 
             // calcula a cor resultante para flat shading
 
-            cor = lanterna.calcIluminacao(pos_camera,
-                                          centro,
-                                          (*i).getNormal(),
-                                          n_matrix,
-                                          mv_matrix);
+            //cor = lanterna.calcIluminacao(pos_camera,
+            //                              centro,
+            //                             (*i).getNormal(),
+            //                              n_matrix,
+            //                              mv_matrix);
 
-            cor += natural.calcIluminacao(pos_camera,
-                                           centro,
-                                           (*i).getNormal(),
-                                           n_matrix,
-                                           mv_matrix);
+            //cor += natural.calcIluminacao(pos_camera,
+            //                               centro,
+            //                               (*i).getNormal(),
+            //                               n_matrix,
+            //                               mv_matrix);
 
-            glColor3fv(glm::value_ptr(cor));
+            // glColor3fv(glm::value_ptr(cor));
 
             for (int j = 0; j < 3; j++) {
+
+                cor = lanterna.calcIluminacao(pos_camera,
+                                              vertices[(*i).getVertice(j)],
+                                              v_normais[(*i).getVertice(j)],
+                                              n_matrix,
+                                              mv_matrix);
+
+                cor += natural.calcIluminacao(pos_camera,
+                                              vertices[(*i).getVertice(j)],
+                                              v_normais[(*i).getVertice(j)],
+                                              n_matrix,
+                                              mv_matrix);
+
+                glColor3fv(glm::value_ptr(cor));
+
                 glVertex3fv(glm::value_ptr(vertices[(*i).getVertice(j)]));
             }
 

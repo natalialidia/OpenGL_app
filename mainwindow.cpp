@@ -3,10 +3,7 @@
 
 #include <string.h>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-{
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainWindow) {
 
     ui->setupUi(this);
 
@@ -18,10 +15,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->canvas, SIGNAL(atualizaContador()),this,SLOT(updatePaperCounter()));
 
     ui->canvas->setFocusPolicy(Qt::StrongFocus);
+
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), ui->canvas, SLOT(idleGL()));
+    timer->start(1000/30);
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete ui;
 }
 
