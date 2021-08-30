@@ -18,7 +18,8 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     meucanvas.cpp \
-    personagem.cpp
+    personagem.cpp \
+    textura.cpp
 
 HEADERS += \
     arvore.h \
@@ -27,7 +28,9 @@ HEADERS += \
     luz.h \
     mainwindow.h \
     meucanvas.h \
-    personagem.h
+    personagem.h \
+    stb_image.h \
+    textura.h
 
 FORMS += \
     mainwindow.ui

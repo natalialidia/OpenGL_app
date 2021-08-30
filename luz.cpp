@@ -9,7 +9,7 @@ Luz::Luz() {
     dec_b = 0.7f;
     dec_c = 1.8f;
 
-    exp_dec = 2;
+    exp_dec = 16;
 
     tipo = 0;
 }

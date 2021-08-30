@@ -9,6 +9,7 @@
 #include "arvore.h"
 #include "camera.h"
 #include "luz.h"
+#include "textura.h"
 
 
 class MeuCanvas : public QOpenGLWidget {
@@ -22,6 +23,8 @@ class MeuCanvas : public QOpenGLWidget {
         Personagem personagem;
         Arvore arvores[10];
 
+        Textura chao;
+
         Luz lanterna;
         Luz natural;
 
@@ -30,6 +33,7 @@ class MeuCanvas : public QOpenGLWidget {
         bool pausado;
 
         void desenhaCenario();
+        void verificaColisao();
 
     signals:
         void atualizaContador();

@@ -50,9 +50,9 @@ MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     lanterna.setAngLuz(12.0f);
 
     natural.setTipo(2);
-    natural.setLuzDif(glm::vec3(.2f));
-    natural.setLuzAmb(glm::vec3(.1f));
-    natural.setLuzEsp(glm::vec3(1));
+    natural.setLuzDif(glm::vec3(.01));
+    natural.setLuzAmb(glm::vec3(.005f));
+    natural.setLuzEsp(glm::vec3(.1f));
 
     pausado = true;
 
@@ -74,6 +74,9 @@ void MeuCanvas::initializeGL() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_NORMALIZE);
+
+    glEnable(GL_TEXTURE_2D);
+    chao.carrega((char*)"debug/texturas/chao2.jpg");
 }
 
 void MeuCanvas::paintGL() {
@@ -140,29 +143,35 @@ void MeuCanvas::desenhaCenario() {
                              glm::vec3(-80,0,80),
                              glm::vec3(80,0,80)};
 
-    glm::vec3 normal = glm::vec3(0,1,0);
+    float tex_coords[4][2] = {{-80, -80},
+                              {81, -80},
+                              {81, 81},
+                              {-80, 81}};
 
+    glm::vec3 normal = glm::normalize(glm::cross(vertices[0]-vertices[1], vertices[0] - vertices[3]));
 
-    glm::vec3 mat_dif = glm::vec3(0.21f, 0.14f, 0.11f);
+    glm::vec3 mat_dif = glm::vec3(0, .4f, 0);
     glm::vec3 mat_esp = glm::vec3(1, 1, 1);
 
     lanterna.setMatDif(mat_dif);
     lanterna.setMatAmb(0.2f * mat_dif);
     lanterna.setMatEsp(mat_esp);
-    lanterna.setMatExp(16);
+    lanterna.setMatExp(32);
 
     natural.setMatDif(mat_dif);
     natural.setMatAmb(0.2f * mat_dif);
     natural.setMatEsp(mat_esp);
-    natural.setMatExp(16);
+    natural.setMatExp(32);
 
     glm::vec3 cor = glm::vec3(0,0,0);
+
+    glBindTexture(GL_TEXTURE_2D, chao.getTexId());
 
     glBegin(GL_QUADS);
 
         for (int i = 0; i < 4; i++) {
 
-            cor = lanterna.calcIluminacao(glm::vec3(camera.getCameraMatrix() * glm::vec4(camera.getEye(), 1.0f)),
+           cor = lanterna.calcIluminacao(glm::vec3(camera.getCameraMatrix() * glm::vec4(camera.getEye(), 1.0f)),
                                           vertices[i],
                                           normal,
                                           glm::transpose(glm::inverse(camera.getCameraMatrix())),
@@ -176,12 +185,32 @@ void MeuCanvas::desenhaCenario() {
 
             glColor3fv(glm::value_ptr(cor));
 
+            glTexCoord2fv(tex_coords[i]);
             glVertex3fv(glm::value_ptr(vertices[i]));
         }
 
 
     glEnd();
 
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+
+}
+
+void MeuCanvas::verificaColisao() {
+
+    glm::vec3 cam_pos = camera.getEye();
+
+    if (cam_pos.z <= 1.0f) {
+
+        if (cam_frente) cam_frente = false;
+        if (cam_tras) cam_tras = false;
+        if (cam_esq) cam_esq = false;
+        if (cam_dir) cam_dir = false;
+
+    }
+
+    qDebug() << cam_pos.z;
 
 }
 
@@ -288,6 +317,8 @@ void MeuCanvas::verificaLocal() {
 }
 
 void MeuCanvas::idleGL() {
+
+    this->verificaColisao();
 
     camera.anda(cam_frente, cam_tras, cam_esq, cam_dir);
 
