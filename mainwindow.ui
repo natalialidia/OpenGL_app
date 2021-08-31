@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>725</width>
-    <height>468</height>
+    <height>514</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -54,6 +54,32 @@
         </spacer>
        </item>
        <item>
+        <widget class="QLabel" name="msgFinal">
+         <property name="text">
+          <string>{msg}</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Total encontrado:</string>
@@ -64,19 +90,6 @@
         <widget class="QLCDNumber" name="contador">
          <property name="segmentStyle">
           <enum>QLCDNumber::Flat</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="msgFinal">
-         <property name="text">
-          <string>{msg}</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
          </property>
         </widget>
        </item>

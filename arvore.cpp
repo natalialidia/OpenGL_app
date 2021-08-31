@@ -7,6 +7,8 @@ Arvore::Arvore() {
     vec_k = glm::vec3(0,0,1);
 
     this->lerOBJ();
+
+    this->calcBoundingBox();
 }
 
 void Arvore::lerOBJ() {
@@ -143,6 +145,35 @@ void Arvore::setPosicao(float x, float y, float z) {
     this->pos = glm::vec3(x,y,z);
 }
 
+void Arvore::calcBoundingBox() {
+
+    x_min = y_min = z_min = FLT_MAX;
+    x_max = y_max = z_max = FLT_MIN;
+
+    for (auto i = vertices.begin(); i != vertices.end(); ++i) {
+
+        if (x_min > (*i).x)
+            x_min = (*i).x;
+
+        if (y_min > (*i).y)
+            y_min = (*i).y;
+
+        if (z_min > (*i).z)
+            z_min = (*i).z;
+
+        if (x_max < (*i).x)
+            x_max = (*i).x;
+
+        if (y_max < (*i).y)
+            y_max = (*i).y;
+
+        if (z_max < (*i).z)
+            z_max = (*i).z;
+
+    }
+
+}
+
 void Arvore::desenha(Luz lanterna, Luz natural, Camera camera) {
 
     // cria a matriz de transformação
@@ -184,27 +215,6 @@ void Arvore::desenha(Luz lanterna, Luz natural, Camera camera) {
 
         for (auto i = faces.begin(); i != faces.end(); ++i) {
 
-            // calcular centro da face para flat shading
-            glm::vec3 centro = (vertices[(*i).getVertice(0)]+
-                                vertices[(*i).getVertice(1)]+
-                                vertices[(*i).getVertice(2)])/3.0f;
-
-            // calcula a cor resultante para flat shading
-
-            //cor = lanterna.calcIluminacao(pos_camera,
-            //                              centro,
-            //                             (*i).getNormal(),
-            //                              n_matrix,
-            //                              mv_matrix);
-
-            //cor += natural.calcIluminacao(pos_camera,
-            //                               centro,
-            //                               (*i).getNormal(),
-            //                               n_matrix,
-            //                               mv_matrix);
-
-            // glColor3fv(glm::value_ptr(cor));
-
             for (int j = 0; j < 3; j++) {
 
                 cor = lanterna.calcIluminacao(pos_camera,
@@ -227,6 +237,49 @@ void Arvore::desenha(Luz lanterna, Luz natural, Camera camera) {
         }
 
     glEnd();
+
+
+    if (anotacao) {
+
+        mat_dif = glm::vec3(1, 1, 1);
+        mat_amb = 0.2f * mat_dif;
+        mat_esp = glm::vec3(1, 1, 1);
+        mat_exp = 32;
+
+        lanterna.setMatDif(mat_dif);
+        lanterna.setMatAmb(mat_amb);
+        lanterna.setMatEsp(mat_esp);
+        lanterna.setMatExp(mat_exp);
+
+        natural.setMatDif(mat_dif);
+        natural.setMatAmb(mat_amb);
+        natural.setMatEsp(mat_esp);
+        natural.setMatExp(mat_exp);
+
+        glBegin(GL_QUADS);
+
+            cor = lanterna.calcIluminacao(pos_camera,
+                                          glm::vec3(x_max-90, y_min+30, z_min+82),
+                                          glm::vec3(0,1,0),
+                                          n_matrix,
+                                          mv_matrix);
+
+            cor += natural.calcIluminacao(pos_camera,
+                                          glm::vec3(x_max-90, y_min+30, z_min+82),
+                                          glm::vec3(0,1,0),
+                                          n_matrix,
+                                          mv_matrix);
+
+            glColor3fv(glm::value_ptr(cor));
+
+            glVertex3f(x_max-100, y_min+30, z_min+75);
+            glVertex3f(x_max-100, y_min+30, z_min+90);
+            glVertex3f(x_max-80, y_min+30, z_min+90);
+            glVertex3f(x_max-80, y_min+30, z_min+75);
+        glEnd();
+
+    }
+
 
     glPopMatrix();
 }

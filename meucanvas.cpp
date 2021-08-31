@@ -6,27 +6,29 @@
 MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     setMouseTracking(true);
 
-
     srand(time(NULL));
     total = 3;
     int n, r, p[total];
     papeis_achados = 0;
 
-    arvores[0].translacao(0,5,10);
-    arvores[0].escala(.02f);
+    float mapa[10][2] = {{3,3},
+                         {4,8},
+                         {-10,12},
+                         {-15,25},
+                         {28,14},
+                         {10,10},
+                         {17,4},
+                         {-5,22},
+                         {22,29},
+                         {7,25},
+                        };
 
-    arvores[1].translacao(3,5,13);
-    arvores[1].escala(.02f);
-    arvores[1].rotacao(45.0f);
-//    arvores[1].setPosicao(10,13);
-//    arvores[2].setPosicao(2,15);
-//    arvores[3].setPosicao(18,8);
-//    arvores[4].setPosicao(8,18);
-//    arvores[5].setPosicao(10,3);
-//    arvores[6].setPosicao(27,6);
-//    arvores[7].setPosicao(20,18);
-//    arvores[8].setPosicao(5,10);
-//    arvores[9].setPosicao(28,20);
+    for (int i = 0; i < 10; i++) {
+        arvores[i].escala(.02f);
+        arvores[i].translacao(mapa[i][0], 4.0f, mapa[i][1]);
+        arvores[i].rotacao(i*36.0f);
+    }
+
     for(int i =0; i<total;i++){
         n =rand()%10;
         r=0;
@@ -122,31 +124,34 @@ void MeuCanvas::paintGL() {
         glVertex3f(0,0,100);
     glEnd();
 
-    arvores[0].desenha(lanterna, natural, camera);
-    arvores[1].desenha(lanterna, natural, camera);
-//    arvores[2].desenha();
-//    arvores[3].desenha();
-//    arvores[4].desenha();
-//    arvores[5].desenha();
-//    arvores[6].desenha();
-//    arvores[7].desenha();
-//    arvores[8].desenha();
-//    arvores[9].desenha();
+    for (int i = 0; i<10; i++) {
+        arvores[i].desenha(lanterna, natural, camera);
+    }
+
+    /*arvores[1].desenha(lanterna, natural, camera);
+    arvores[2].desenha(lanterna, natural, camera);
+    arvores[3].desenha(lanterna, natural, camera);
+    arvores[4].desenha(lanterna, natural, camera);
+    arvores[5].desenha(lanterna, natural, camera);
+    arvores[6].desenha(lanterna, natural, camera);
+    arvores[7].desenha(lanterna, natural, camera);
+    arvores[8].desenha(lanterna, natural, camera);
+    arvores[9].desenha(lanterna, natural, camera);*/
 //    personagem.desenha();
 
 }
 
 void MeuCanvas::desenhaCenario() {
 
-    glm::vec3 vertices[4] = {glm::vec3(80,0,0),
-                             glm::vec3(-80,0,0),
-                             glm::vec3(-80,0,80),
-                             glm::vec3(80,0,80)};
+    glm::vec3 vertices[4] = {glm::vec3(30,0,0),
+                             glm::vec3(-30,0,0),
+                             glm::vec3(-30,0,30),
+                             glm::vec3(30,0,30)};
 
-    float tex_coords[4][2] = {{-80, -80},
-                              {81, -80},
-                              {81, 81},
-                              {-80, 81}};
+    float tex_coords[4][2] = {{-30, -30},
+                              {31, -30},
+                              {31, 31},
+                              {-30, 31}};
 
     glm::vec3 normal = glm::normalize(glm::cross(vertices[0]-vertices[1], vertices[0] - vertices[3]));
 
@@ -294,15 +299,15 @@ void MeuCanvas::mouseMoveEvent(QMouseEvent* event) {
 
 void MeuCanvas::verificaLocal() {
 
-    glm::vec3 personagem_pos = personagem.getPos();
+    glm::vec3 camera_pos = camera.getEye();
     glm::vec3 arvore_pos;
 
     for (unsigned int i = 0; i < sizeof(arvores); i++){
 
         arvore_pos = arvores[i].getPosicao();
 
-        if (personagem_pos.x <= arvore_pos.x + 1.25 && personagem_pos.x >= arvore_pos.x - 1.25 &&
-            personagem_pos.y <= arvore_pos.y + 1.25 && personagem_pos.y >= arvore_pos.y - 1.25) {
+        if (camera_pos.x <= arvore_pos.x + 1.8 && camera_pos.x >= arvore_pos.x - 1.8 &&
+            camera_pos.z <= arvore_pos.z + 1.8 && camera_pos.z >= arvore_pos.z - 1.8) {
 
             if (arvores[i].getAnotacao()) {
                 papeis_achados++;
@@ -318,7 +323,7 @@ void MeuCanvas::verificaLocal() {
 
 void MeuCanvas::idleGL() {
 
-    this->verificaColisao();
+    //this->verificaColisao();
 
     camera.anda(cam_frente, cam_tras, cam_esq, cam_dir);
 

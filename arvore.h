@@ -31,9 +31,13 @@ class Arvore {
         vector <glm::vec3> v_normais;
         vector <Face> faces;
 
+        float x_min, y_min, z_min, x_max, y_max, z_max;
+
         void lerOBJ();
         void setVertices(QStringList fields);
         void setFaces(QStringList fields);
+        void calcBoundingBox();
+
 
     public:
         Arvore();
