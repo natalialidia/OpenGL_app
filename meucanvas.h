@@ -1,3 +1,5 @@
+//Natália Lídia Lima Coelho - 472327
+
 #ifndef MEUCANVAS_H
 #define MEUCANVAS_H
 
@@ -11,29 +13,31 @@
 #include "luz.h"
 #include "textura.h"
 
+#include <vector>
 
 class MeuCanvas : public QOpenGLWidget {
 
     Q_OBJECT
 
     private:
+        QTime tempo;
+        int total_papeis;
+        int papeis_achados;
+        bool pausado;
+
         Camera camera;
         int cam_frente, cam_tras, cam_esq, cam_dir;
 
         Personagem personagem;
-        Arvore arvores[10];
+        std::vector<Arvore> arvores;
+        int num_arvores;
 
         Textura chao;
 
         Luz lanterna;
         Luz natural;
 
-        int total;
-        int papeis_achados;
-        bool pausado;
-
         void desenhaCenario();
-        void verificaColisao();
 
     signals:
         void atualizaContador();
@@ -41,6 +45,10 @@ class MeuCanvas : public QOpenGLWidget {
     public:
         MeuCanvas(QWidget * parent);
 
+        QTime getTempo();
+        void setTempo(QTime tempo);
+        bool getPausado();
+        void setPausado(bool pausado);
         int getTotal();
         int getPapeisAchados();
         void initializeGL();

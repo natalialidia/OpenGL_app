@@ -3,22 +3,13 @@
 
 #include <QOpenGLWidget>
 
-#include "glm/glm.hpp"
 #include "glm/vec3.hpp"
-#include "glm/mat4x4.hpp"
-#include "glm/vec4.hpp"
-#include "glm/ext.hpp"
-#include "glm/trigonometric.hpp"
 
 #include "face.h"
 #include "luz.h"
 #include "camera.h"
 
 #include <QString>
-#include <QFile>
-#include <QTextStream>
-#include <QDebug>
-
 #include <vector>
 using namespace std;
 

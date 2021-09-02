@@ -1,6 +1,10 @@
 // Natália Lídia Lima Coelho - 472327
 
 #include "camera.h"
+#include <GL/gl.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/trigonometric.hpp>
 
 Camera::Camera() {
 }
@@ -47,7 +51,7 @@ void Camera::setCamera() {
 
 void Camera::anda(int frente, int tras, int esq, int dir) {
 
-    float velocidade = 0.15f;
+    float velocidade = 0.2f;
 
     glm::vec3 pos = eye;
 

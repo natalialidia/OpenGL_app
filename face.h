@@ -2,7 +2,6 @@
 #define FACE_H
 
 #include "glm/vec3.hpp"
-#include <GL/gl.h>
 
 class Face {
     private:

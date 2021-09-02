@@ -1,3 +1,5 @@
+//Natália Lídia Lima Coelho - 472327
+
 #include "meucanvas.h"
 #include <time.h>
 #include <stdlib.h>
@@ -6,9 +8,8 @@
 MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     setMouseTracking(true);
 
-    srand(time(NULL));
-    total = 3;
-    int n, r, p[total];
+    tempo.setHMS(0,10,0); // tempo limite de 1 minuto
+    total_papeis = 3; // total de 3 papeis;
     papeis_achados = 0;
 
     float mapa[10][2] = {{3,3},
@@ -23,28 +24,41 @@ MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
                          {7,25},
                         };
 
-    for (int i = 0; i < 10; i++) {
+    num_arvores = 10;
+
+    for (int i = 0; i < num_arvores; i++) {
+        Arvore a;
+        arvores.push_back(a);
         arvores[i].escala(.02f);
         arvores[i].translacao(mapa[i][0], 4.0f, mapa[i][1]);
         arvores[i].rotacao(i*36.0f);
     }
 
-    for(int i =0; i<total;i++){
-        n =rand()%10;
-        r=0;
-        for(int j=0; j<total; j++){
-                if(n == p[j]){
-                    r++;
-                }
-         }if(r==0){
-            p[i]=n;
-            arvores[n].setAnotacao(true);
-         }if(r!=0){
-            i--;
+    srand(time(NULL));
+    int id_arvore, repeticao, p[total_papeis];
+
+    // anotações em árvores aleatórias
+    for (int i = 0; i < total_papeis; i++) {
+        id_arvore = rand()%num_arvores;
+        repeticao = 0;
+
+        for (int j = 0; j < total_papeis; j++) {
+            if (id_arvore == p[j]) {
+                repeticao++;
             }
+        }
+
+        if (repeticao == 0) {
+            p[i]=id_arvore;
+            arvores[id_arvore].setAnotacao(true);
+        }
+
+        if(repeticao != 0) {
+            i--;
+        }
     }
 
-    camera.setEye(0,1.7f,0);
+    camera.setEye(0,1.7f,5);
     camera.setAt(0, 0, 5);
     camera.setUp(0, 1, 0);
 
@@ -52,16 +66,31 @@ MeuCanvas::MeuCanvas(QWidget * parent) : QOpenGLWidget(parent) {
     lanterna.setAngLuz(12.0f);
 
     natural.setTipo(2);
-    natural.setLuzDif(glm::vec3(.01));
-    natural.setLuzAmb(glm::vec3(.005f));
-    natural.setLuzEsp(glm::vec3(.1f));
+    natural.setLuzDif(glm::vec3(1.0f));
+    natural.setLuzAmb(glm::vec3(.5f));
+    natural.setLuzEsp(glm::vec3(1.0f));
 
     pausado = true;
+}
 
+QTime MeuCanvas::getTempo() {
+    return this->tempo;
+}
+
+void MeuCanvas::setTempo(QTime tempo) {
+    this->tempo = tempo;
+}
+
+bool MeuCanvas::getPausado() {
+    return this->pausado;
+}
+
+void MeuCanvas::setPausado(bool pausado) {
+    this->pausado = pausado;
 }
 
 int MeuCanvas::getTotal() {
-    return this->total;
+    return this->total_papeis;
 }
 
 int MeuCanvas::getPapeisAchados() {
@@ -111,49 +140,32 @@ void MeuCanvas::paintGL() {
 
     this->desenhaCenario();
 
-    glLineWidth(10);
-    glBegin(GL_LINES);
-        glColor3f(1, 0, 0);
-        glVertex3f(-100,0,0);
-        glVertex3f(100,0,0);
-        glColor3f(0, 1, 0);
-        glVertex3f(0,-100,0);
-        glVertex3f(0,100,0);
-        glColor3f(0, 0, 1);
-        glVertex3f(0,0,0);
-        glVertex3f(0,0,100);
-    glEnd();
-
-    for (int i = 0; i<10; i++) {
+    for (int i = 0; i < num_arvores; i++) {
         arvores[i].desenha(lanterna, natural, camera);
     }
-
-    /*arvores[1].desenha(lanterna, natural, camera);
-    arvores[2].desenha(lanterna, natural, camera);
-    arvores[3].desenha(lanterna, natural, camera);
-    arvores[4].desenha(lanterna, natural, camera);
-    arvores[5].desenha(lanterna, natural, camera);
-    arvores[6].desenha(lanterna, natural, camera);
-    arvores[7].desenha(lanterna, natural, camera);
-    arvores[8].desenha(lanterna, natural, camera);
-    arvores[9].desenha(lanterna, natural, camera);*/
-//    personagem.desenha();
-
 }
 
 void MeuCanvas::desenhaCenario() {
 
-    glm::vec3 vertices[4] = {glm::vec3(30,0,0),
-                             glm::vec3(-30,0,0),
-                             glm::vec3(-30,0,30),
-                             glm::vec3(30,0,30)};
+    float lado = 30;
+    float altura = 5;
 
-    float tex_coords[4][2] = {{-30, -30},
-                              {31, -30},
-                              {31, 31},
-                              {-30, 31}};
+    glm::vec3 vertices[] = {
+        glm::vec3( lado, 0, 0),
+        glm::vec3(-lado, 0, 0),
+        glm::vec3(-lado, 0, lado),
+        glm::vec3( lado, 0, lado),
 
-    glm::vec3 normal = glm::normalize(glm::cross(vertices[0]-vertices[1], vertices[0] - vertices[3]));
+        glm::vec3( lado, altura, 0),
+        glm::vec3(-lado, altura, 0),
+        glm::vec3(-lado, altura, lado),
+        glm::vec3( lado, altura, lado)
+    };
+
+    float tex_coords[4][2] = {{-lado,   -lado},
+                              { lado+1, -lado},
+                              { lado+1,  lado+1},
+                              {-lado,    lado+1}};
 
     glm::vec3 mat_dif = glm::vec3(0, .4f, 0);
     glm::vec3 mat_esp = glm::vec3(1, 1, 1);
@@ -174,22 +186,20 @@ void MeuCanvas::desenhaCenario() {
 
     glBegin(GL_QUADS);
 
+        cor = lanterna.calcIluminacao(glm::vec3(camera.getCameraMatrix() * glm::vec4(camera.getEye(), 1.0f)),
+                                       glm::vec3(0,0,lado/2),
+                                       glm::vec3(0,1,0),
+                                       glm::transpose(glm::inverse(camera.getCameraMatrix())),
+                                       camera.getCameraMatrix());
+
+        cor += natural.calcIluminacao(glm::vec3(camera.getCameraMatrix() * glm::vec4(camera.getEye(), 1.0f)),
+                                      glm::vec3(0,0,lado/2),
+                                      glm::vec3(0,1,0),
+                                      glm::transpose(glm::inverse(camera.getCameraMatrix())),
+                                      camera.getCameraMatrix());
+
+        glColor3fv(glm::value_ptr(cor));
         for (int i = 0; i < 4; i++) {
-
-           cor = lanterna.calcIluminacao(glm::vec3(camera.getCameraMatrix() * glm::vec4(camera.getEye(), 1.0f)),
-                                          vertices[i],
-                                          normal,
-                                          glm::transpose(glm::inverse(camera.getCameraMatrix())),
-                                          camera.getCameraMatrix());
-
-            cor += natural.calcIluminacao(glm::vec3(camera.getCameraMatrix() * glm::vec4(camera.getEye(), 1.0f)),
-                                          vertices[i],
-                                          normal,
-                                          glm::transpose(glm::inverse(camera.getCameraMatrix())),
-                                          camera.getCameraMatrix());
-
-            glColor3fv(glm::value_ptr(cor));
-
             glTexCoord2fv(tex_coords[i]);
             glVertex3fv(glm::value_ptr(vertices[i]));
         }
@@ -197,56 +207,88 @@ void MeuCanvas::desenhaCenario() {
 
     glEnd();
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+    int indices_paredes[4][4] = {{5,6,2,1},
+                                 {3,7,4,0},
+                                 {2,6,7,3},
+                                 {1,0,4,5}};
 
 
-}
+    glm::vec3 normais_paredes[4] = {glm::vec3(1,0,0),
+                                    glm::vec3(-1,0,0),
+                                    glm::vec3(0,0,1),
+                                    glm::vec3(0,0,-1)};
 
-void MeuCanvas::verificaColisao() {
+    mat_dif = glm::vec3(.6f, .6f, .6f);
+    mat_esp = glm::vec3(1, 1, 1);
 
-    glm::vec3 cam_pos = camera.getEye();
+    lanterna.setMatDif(mat_dif);
+    lanterna.setMatAmb(0.2f * mat_dif);
+    lanterna.setMatEsp(mat_esp);
+    lanterna.setMatExp(32);
 
-    if (cam_pos.z <= 1.0f) {
+    natural.setMatDif(mat_dif);
+    natural.setMatAmb(0.2f * mat_dif);
+    natural.setMatEsp(mat_esp);
+    natural.setMatExp(32);
 
-        if (cam_frente) cam_frente = false;
-        if (cam_tras) cam_tras = false;
-        if (cam_esq) cam_esq = false;
-        if (cam_dir) cam_dir = false;
+    glBegin(GL_QUADS);
 
-    }
+        for (int i = 0; i < 4; i++) {
 
-    qDebug() << cam_pos.z;
+            cor = lanterna.calcIluminacao(glm::vec3(camera.getCameraMatrix() * glm::vec4(camera.getEye(), 1.0f)),
+                                           vertices[i],
+                                           normais_paredes[i],
+                                           glm::transpose(glm::inverse(camera.getCameraMatrix())),
+                                           camera.getCameraMatrix());
+
+            cor += natural.calcIluminacao(glm::vec3(camera.getCameraMatrix() * glm::vec4(camera.getEye(), 1.0f)),
+                                           vertices[i],
+                                           normais_paredes[i],
+                                           glm::transpose(glm::inverse(camera.getCameraMatrix())),
+                                           camera.getCameraMatrix());
+
+            glColor3fv(glm::value_ptr(cor));
+            for (int j = 0; j < 4; j++) {
+                glVertex3fv(glm::value_ptr(vertices[indices_paredes[i][j]]));
+            }
+        }
+
+    glEnd();
 
 }
 
 void MeuCanvas::keyPressEvent(QKeyEvent *e) {
 
-    switch(e->key()) {
+    if (!pausado) {
 
-        case Qt::Key_W: {
-            cam_frente = 1;
-            break;
+        switch(e->key()) {
+
+            case Qt::Key_W: {
+                cam_frente = 1;
+                break;
+            }
+            case Qt::Key_S: {
+                cam_tras = 1;
+                break;
+            }
+            case Qt::Key_A: {
+                cam_esq = 1;
+                break;
+            }
+            case Qt::Key_D: {
+                cam_dir = 1;
+                break;
+            }
+            case Qt::Key_E: {
+                MeuCanvas::verificaLocal();
+                break;
+            }
         }
-        case Qt::Key_S: {
-            cam_tras = 1;
-            break;
-        }
-        case Qt::Key_A: {
-            cam_esq = 1;
-            break;
-        }
-        case Qt::Key_D: {
-            cam_dir = 1;
-            break;
-        }
-        case Qt::Key_E:
-            MeuCanvas::verificaLocal();
-            break;
-        case Qt::Key_Escape: {
-            unsetCursor();
-            pausado = true;
-            break;
-        }
+    }
+
+    if (e->key() == Qt::Key_Escape) {
+        unsetCursor();
+        pausado = true;
     }
 
 }
@@ -302,7 +344,7 @@ void MeuCanvas::verificaLocal() {
     glm::vec3 camera_pos = camera.getEye();
     glm::vec3 arvore_pos;
 
-    for (unsigned int i = 0; i < sizeof(arvores); i++){
+    for (int i = 0; i < num_arvores; i++){
 
         arvore_pos = arvores[i].getPosicao();
 
@@ -322,8 +364,6 @@ void MeuCanvas::verificaLocal() {
 }
 
 void MeuCanvas::idleGL() {
-
-    //this->verificaColisao();
 
     camera.anda(cam_frente, cam_tras, cam_esq, cam_dir);
 

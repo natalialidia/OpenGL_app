@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>725</width>
-    <height>514</height>
+    <width>730</width>
+    <height>561</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,14 +23,20 @@
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QWidget" name="menu" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>50</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>40</height>
+        <height>50</height>
        </size>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
+       <item alignment="Qt::AlignLeft">
         <widget class="QLabel" name="objetivo">
          <property name="text">
           <string>{objetivo}</string>
@@ -40,20 +46,29 @@
          </property>
         </widget>
        </item>
-       <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+       <item alignment="Qt::AlignHCenter">
+        <widget class="QLCDNumber" name="lcd_countdown">
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
          </property>
-        </spacer>
+         <property name="lineWidth">
+          <number>1</number>
+         </property>
+         <property name="smallDecimalPoint">
+          <bool>false</bool>
+         </property>
+         <property name="segmentStyle">
+          <enum>QLCDNumber::Flat</enum>
+         </property>
+         <property name="intValue" stdset="0">
+          <number>0</number>
+         </property>
+        </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignRight">
         <widget class="QLabel" name="msgFinal">
          <property name="text">
           <string>{msg}</string>
@@ -66,8 +81,29 @@
          </property>
         </widget>
        </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="MeuCanvas" name="canvas"/>
+    </item>
+    <item>
+     <widget class="QWidget" name="widget" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>50</height>
+       </size>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <spacer name="horizontalSpacer_2">
+        <spacer name="horizontalSpacer_3">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -88,22 +124,18 @@
        </item>
        <item>
         <widget class="QLCDNumber" name="contador">
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
+         <property name="lineWidth">
+          <number>1</number>
+         </property>
          <property name="segmentStyle">
           <enum>QLCDNumber::Flat</enum>
          </property>
         </widget>
        </item>
       </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="MeuCanvas" name="canvas">
-      <property name="minimumSize">
-       <size>
-        <width>600</width>
-        <height>450</height>
-       </size>
-      </property>
      </widget>
     </item>
    </layout>

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QTime>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,9 +17,11 @@ class MainWindow : public QMainWindow {
         ~MainWindow();
     public slots:
         void updatePaperCounter();
+        void updateCountdown();
 
     private:
         Ui::MainWindow *ui;
         QTimer *timer;
+        QTimer *countdown;
 };
 #endif // MAINWINDOW_H

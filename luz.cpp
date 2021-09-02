@@ -1,4 +1,5 @@
 #include "luz.h"
+#include "glm/gtc/type_ptr.hpp"
 
 Luz::Luz() {
     luz_amb = glm::vec3(.20f, .20f, .20f);
